@@ -1143,6 +1143,170 @@
                 transition: none !important;
             }
         }
+
+        /* ==========================================================================
+   COOKIE CONSENT COMPONENT (INTEGRATED)
+   ========================================================================== */
+
+        /* Contenedor principal del banner (Estilo Glass flotante) */
+        .cookie-banner {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            max-width: 380px;
+            background: var(--glass-l);
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            border: 1px solid var(--line-strong);
+            border-radius: var(--radius);
+            padding: 28px;
+            box-shadow: 0 16px 40px #0a0a0a0f;
+            display: none;
+            /* Controlado por JavaScript */
+            z-index: 200;
+        }
+
+        /* Tipografías del Banner */
+        .cookie-banner h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .cookie-banner p {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        /* Panel de Ajustes por Categorías */
+        .cookie-config {
+            display: none;
+            margin: 20px 0;
+            padding: 16px;
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+        }
+
+        .config-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 13.5px;
+        }
+
+        .config-item:not(:last-child) {
+            border-bottom: 1px solid var(--line);
+        }
+
+        .config-item span strong {
+            font-weight: 600;
+        }
+
+        /* Switches / Checkboxes Minimalistas */
+        .config-item input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 36px;
+            height: 20px;
+            background: var(--line-strong);
+            border-radius: 100px;
+            position: relative;
+            cursor: pointer;
+            transition: background .2s ease;
+        }
+
+        .config-item input[type="checkbox"]:checked {
+            background: var(--black);
+        }
+
+        .config-item input[type="checkbox"]::before {
+            content: '';
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--white);
+            top: 3px;
+            left: 3px;
+            transition: transform .2s ease;
+        }
+
+        .config-item input[type="checkbox"]:checked::before {
+            transform: translateX(16px);
+        }
+
+        .config-item input[type="checkbox"]:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Botones de Acción (Heredan el comportamiento de tu .btn-primary y .btn-ghost) */
+        .cookie-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .cookie-btn {
+            flex: 1;
+            font-family: var(--ff-display);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 12px 16px;
+            border-radius: 100px;
+            cursor: pointer;
+            text-align: center;
+            border: none;
+            transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+        }
+
+        /* Variación Aceptar (Estilo .btn-primary) */
+        .cookie-btn.btn-accept {
+            background: var(--black);
+            color: var(--white);
+        }
+
+        .cookie-btn.btn-accept:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px #0a0a0a20;
+        }
+
+        /* Variación Rechazar/Configurar (Estilo .btn-ghost) */
+        .cookie-btn.btn-secondary {
+            border: 1px solid var(--line-strong);
+            background: transparent;
+            color: var(--black);
+        }
+
+        .cookie-btn.btn-secondary:hover {
+            border-color: var(--black);
+        }
+
+        /* Enlace/Disparador permanente en el Footer (Estilo .eyebrow) */
+        .cookie-revoke-link {
+            font-family: var(--ff-mono);
+            font-size: 11px;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: var(--muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: color .2s ease;
+            padding: 8px 0;
+        }
+
+        .cookie-revoke-link:hover {
+            color: var(--black);
+        }
     </style>
 </head>
 
@@ -1578,8 +1742,40 @@
                 <span>© 2026 zero ●. Todos los derechos reservados.</span>
                 <span>Iniciador de pagos regulado bajo PSD2</span>
             </div>
+            <button class="cookie-revoke-link" onclick="openCookieBanner()">Cookies</button>
         </div>
     </footer>
+    <!-- COMPONENTE: BANNER DE COOKIES -->
+    <div id="cookieBanner" class="cookie-banner">
+        <h3>Privacidad</h3>
+        <p>Utilizamos cookies analíticas y de marketing para mejorar tu experiencia en nuestra plataforma. Elige tu configuración.</p>
+
+        <!-- Ajustes por Categorías -->
+        <div id="cookieConfig" class="cookie-config">
+            <div class="config-item">
+                <span><strong>Esenciales</strong></span>
+                <input type="checkbox" checked disabled>
+            </div>
+            <div class="config-item">
+                <span><strong>Analíticas</strong></span>
+                <input type="checkbox" id="cookiesAnalytics">
+            </div>
+            <div class="config-item">
+                <span><strong>Marketing</strong></span>
+                <input type="checkbox" id="cookiesMarketing">
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        <div class="cookie-buttons">
+            <div class="btn-row">
+                <button class="cookie-btn btn-accept" onclick="acceptAllCookies()">Aceptar todo</button>
+                <button class="cookie-btn btn-secondary" onclick="rejectAllCookies()">Rechazar</button>
+            </div>
+            <button id="btnToggleSettings" class="cookie-btn btn-secondary" onclick="toggleSettings()">Preferencias</button>
+            <button id="btnSaveConfig" class="cookie-btn btn-accept" style="display:none;" onclick="saveCustomCookies()">Guardar selección</button>
+        </div>
+    </div>
 
     <script>
         const els = document.querySelectorAll('.reveal');
@@ -1625,6 +1821,85 @@
                 if (!wasOpen) item.classList.add('open');
             });
         });
+    </script>
+    <script>
+        const banner = document.getElementById('cookieBanner');
+        const configPanel = document.getElementById('cookieConfig');
+        const btnSaveConfig = document.getElementById('btnSaveConfig');
+        const btnToggleSettings = document.getElementById('btnToggleSettings');
+
+        window.onload = function() {
+            const consent = localStorage.getItem('cookieConsent');
+            if (!consent) {
+                banner.style.display = 'block';
+            } else {
+                executeScripts(JSON.parse(consent));
+            }
+        };
+
+        function openCookieBanner() {
+            banner.style.display = 'block';
+        }
+
+        function toggleSettings() {
+            const isHidden = configPanel.style.display === 'none' || configPanel.style.display === '';
+            configPanel.style.display = isHidden ? 'block' : 'none';
+            btnSaveConfig.style.display = isHidden ? 'block' : 'none';
+            btnToggleSettings.style.display = isHidden ? 'none' : 'block';
+        }
+
+        function acceptAllCookies() {
+            const consent = {
+                analytics: true,
+                marketing: true
+            };
+            saveConsent(consent);
+        }
+
+        function rejectAllCookies() {
+            const consent = {
+                analytics: false,
+                marketing: false
+            };
+            saveConsent(consent);
+        }
+
+        function saveCustomCookies() {
+            const consent = {
+                analytics: document.getElementById('cookiesAnalytics').checked,
+                marketing: document.getElementById('cookiesMarketing').checked
+            };
+            saveConsent(consent);
+        }
+
+        function saveConsent(consent) {
+            localStorage.setItem('cookieConsent', JSON.stringify(consent));
+            banner.style.display = 'none';
+            executeScripts(consent);
+        }
+
+        // CONTROL REMOTO Y BLOQUEO DE SCRIPTS
+        function executeScripts(consent) {
+            if (consent.analytics) {
+                console.log("Inicializando Google Analytics...");
+                let scriptGA = document.createElement('script');
+                scriptGA.async = true;
+                scriptGA.src = "https://www.googletagmanager.com/gtag/js?id=G-9LG1S598NR";
+                document.head.appendChild(scriptGA);
+
+                // 2. Esto reemplaza al segundo bloque de tu <script>
+                window.dataLayer = window.dataLayer || [];
+                window.gtag = function() {
+                    dataLayer.push(arguments);
+                }
+                gtag('js', new Date());
+                gtag('config', 'G-9LG1S598NR');
+            }
+
+            if (consent.marketing) {
+                console.log("Inicializando cookies de marketing...");
+            }
+        }
     </script>
 
 </body>
